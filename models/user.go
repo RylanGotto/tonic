@@ -5,17 +5,18 @@ import (
 	"database/sql"
 	"log"
 	"omni/utils"
+	"strconv"
 )
 
 type User struct {
-	ID       int64  `json:"ID"`
+	ID       string `json:"ID"`
 	Name     string `json:"name"`
 	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
 type UserModel struct {
-	DB  *sql.DB
-	Log *log.Logger
+	DB *sql.DB
 }
 
 func (u UserModel) ListUsers() ([]User, error) {
@@ -30,7 +31,7 @@ func (u UserModel) ListUsers() ([]User, error) {
 	for rows.Next() {
 		var u User
 
-		err := rows.Scan(&u.ID, &u.Name)
+		err := rows.Scan(&u.ID, &u.Name, &u.Email)
 		if err != nil {
 			return nil, err
 		}
@@ -48,40 +49,57 @@ func (u UserModel) ListUserById(id string) (User, error) {
 
 	user := User{}
 
-	if err := row.Scan(&user.ID, &user.Name); err != nil {
-		log.Fatalf("error while scanning row %v", err)
-
+	if err := row.Scan(&user.ID, &user.Name, &user.Email); err != nil {
+		return user, err
 	}
 
 	if err := row.Err(); err != nil {
-		log.Fatalf("error while scanning row %v", err)
+		return user, err
+	}
+	return user, err
+}
+
+func (u UserModel) ListUserByEmail(email string) (User, error) {
+	var err error
+
+	row := u.DB.QueryRow("SELECT * FROM Users where email=?", email)
+
+	user := User{}
+
+	if err := row.Scan(&user.ID, &user.Name, &user.Password, &user.Email); err != nil {
+		return user, err
+	}
+
+	if err := row.Err(); err != nil {
+		return user, err
 	}
 	return user, err
 }
 
 func (u UserModel) CreateUser(usr User) (User, error) {
-	q := "INSERT INTO Users (Name, Password) VALUES (?, ?)"
+	q := "INSERT INTO Users (Name, Password, Email) VALUES (?, ?, ?)"
 	hash, err := utils.HashPassword(usr.Password)
 
 	if err != nil {
-		log.Fatalf("error when hashing password: %v", err)
+		return usr, err
 	}
 
-	r, err := u.DB.ExecContext(context.Background(), q, usr.Name, hash)
+	r, err := u.DB.ExecContext(context.Background(), q, usr.Name, hash, usr.Email)
 
 	if err != nil {
-		log.Fatalf("error while inserting user: %v", err)
+		return usr, err
 	}
 
 	id, err := r.LastInsertId()
 
 	if err != nil {
-		log.Fatalf("cannot retrieve last inserted id: %s", err)
+		return usr, err
 	}
 
 	user := User{
-		ID:   id,
-		Name: usr.Name,
+		ID:    strconv.FormatInt(id, 10),
+		Name:  usr.Name,
+		Email: usr.Email,
 	}
 
 	return user, nil

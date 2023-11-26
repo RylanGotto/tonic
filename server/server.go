@@ -13,18 +13,24 @@ type Env struct {
 		ListUserById(id string) (models.User, error)
 		CreateUser(usr models.User) (models.User, error)
 	}
+	auth interface {
+		LoginUser(u models.User) (models.Auth, error)
+	}
 }
 
 func Serv(db *sql.DB) {
 	r := gin.Default()
 
+	r.Use(IsAuthorized())
+
+	um := models.UserModel{DB: db}
 	env := &Env{
-		users: models.UserModel{DB: db},
+		users: um,
+		auth:  models.AuthModel{UM: um},
 	}
 
-	r.GET("/users", env.listUsersHandler)
-	r.GET("/users/:id", env.listUserByIDHandler)
-	r.POST("/users", env.createUserHandler)
+	env.userRoutes(r)
+	env.authRoutes(r)
 
 	r.Run() // listen and serve on
 }

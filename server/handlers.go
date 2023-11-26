@@ -31,13 +31,32 @@ func (env *Env) listUserByIDHandler(c *gin.Context) {
 
 func (env *Env) createUserHandler(c *gin.Context) {
 	var user models.User
+
 	if err := c.BindJSON(&user); err != nil {
 		c.AbortWithError(http.StatusBadRequest, err)
 	} else {
 		u, err := env.users.CreateUser(user)
 		if err != nil {
 			c.AbortWithError(http.StatusBadRequest, err)
+		} else {
+			c.IndentedJSON(http.StatusOK, u)
 		}
-		c.IndentedJSON(http.StatusOK, u)
+
+	}
+}
+
+func (env *Env) loginUserHandler(c *gin.Context) {
+	var user models.User
+
+	if err := c.BindJSON(&user); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+	} else {
+		at, err := env.auth.LoginUser(user)
+		if err != nil {
+			c.AbortWithError(http.StatusBadRequest, err)
+		} else {
+			c.IndentedJSON(http.StatusOK, at)
+		}
+
 	}
 }
