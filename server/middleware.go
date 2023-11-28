@@ -16,7 +16,7 @@ func IsAuthorized() gin.HandlerFunc {
 				token := t[1]
 				_, err := models.ParseToken(token)
 				if err != nil {
-					c.JSON(401, gin.H{"error": "unauthorized"})
+					c.JSON(401, gin.H{"error": err})
 					c.Abort()
 					return
 				}

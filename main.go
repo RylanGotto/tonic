@@ -1,9 +1,9 @@
 package main
 
 import (
+	"fmt"
 	"log"
-	"omni/dbase"
-	"omni/server"
+	"omni/openai"
 	"os"
 )
 
@@ -14,11 +14,18 @@ func main() {
 	}
 	log.SetOutput(file)
 
-	db, err := dbase.InitDatabase()
+	// db, err := dbase.InitDatabase()
 
-	if err != nil {
-		log.Fatal(err)
-	}
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	server.Serv(db)
+	// server.Serv(db)
+
+	client := openai.InitClient()
+
+	r := client.OpenAiCall.CreateAssistant()
+	f := client.OpenAiCall.ChatCompletion("Hello, I am Rylan. How are you.")
+	fmt.Println(r)
+	fmt.Println(f)
 }

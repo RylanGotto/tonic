@@ -21,7 +21,7 @@ type Env struct {
 func Serv(db *sql.DB) {
 	r := gin.Default()
 
-	r.Use(IsAuthorized())
+	// r.Use(IsAuthorized())
 
 	um := models.UserModel{DB: db}
 	env := &Env{

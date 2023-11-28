@@ -3,8 +3,8 @@ package server
 import "github.com/gin-gonic/gin"
 
 func (env *Env) userRoutes(r *gin.Engine) {
-	r.GET("/users", env.listUsersHandler)
-	r.GET("/users/:id", env.listUserByIDHandler)
+	r.GET("/users", IsAuthorized(), env.listUsersHandler)
+	r.GET("/users/:id", IsAuthorized(), env.listUserByIDHandler)
 	r.POST("/users", env.createUserHandler)
 }
 

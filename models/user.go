@@ -20,7 +20,7 @@ type UserModel struct {
 }
 
 func (u UserModel) ListUsers() ([]User, error) {
-	rows, err := u.DB.Query("SELECT id, Name FROM Users")
+	rows, err := u.DB.Query("SELECT id, Name, Email FROM Users")
 	if err != nil {
 		log.Fatal()
 		return nil, err
