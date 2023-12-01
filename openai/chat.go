@@ -23,7 +23,7 @@ type Choices struct {
 	FinishReason string  `json:"finish_reason"`
 }
 
-type ChatCompletionRes struct {
+type ChatCompletion struct {
 	Id                 string    `json:"id"`
 	Object             string    `json:"object"`
 	Created            int       `json:"created"`
@@ -38,7 +38,7 @@ type ChatCompletionPayload struct {
 	Messages []M    `json:"messages"`
 }
 
-func (c Client) ChatCompletion(um string) *ChatCompletionRes {
+func (c Client) ChatCompletion(um string) *ChatCompletion {
 	h := Headers()
 
 	var messages []M
@@ -60,11 +60,11 @@ func (c Client) ChatCompletion(um string) *ChatCompletionRes {
 		Payload: p,
 	}
 
-	resp, err := c.DispatchRequest(r, &ChatCompletionRes{})
+	resp, err := c.DispatchRequest(r, &ChatCompletion{})
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return resp.(*ChatCompletionRes)
+	return resp.(*ChatCompletion)
 }

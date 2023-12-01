@@ -1,0 +1,14 @@
+{
+  "name": "wikipeida",
+  "description": "Gets search results from wikipedia",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "The user query to get infomation from wikipedia about"
+      }
+    },
+    "required": ["query"]
+  }
+}

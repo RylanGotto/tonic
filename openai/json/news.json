@@ -1,0 +1,23 @@
+{
+  "name": "news",
+  "description": "Get news from NewsAPI",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "The user query to get news articles about"
+      },
+      "category": {
+        "type": "string",
+        "description": "The category of what the user is searching for. Examples: business, entertainment, general, health, science, sports, technology"
+      },
+      "source": {
+        "type": "string",
+        "description": "The name of the news source if the user provided one. Example CNN, BBC, CNBC, NBC, FOX, etc. If not provided default to null",
+        "default": null
+      }
+    },
+    "required": ["query"]
+  }
+}

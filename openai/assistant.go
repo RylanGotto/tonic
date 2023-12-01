@@ -11,7 +11,7 @@ type Tools struct {
 	Type string
 }
 
-type AssistantRes struct {
+type Assistant struct {
 	ID           string      `json:"id"`
 	Object       string      `json:"object"`
 	Created_at   int         `json:"created_at"`
@@ -31,9 +31,10 @@ type AssistantPayload struct {
 	Model        string `json:"model"`
 }
 
-func (c Client) CreateAssistant() *AssistantRes {
+func (c Client) CreateAssistant() *Assistant {
 	h := Headers()
-	h["OpenAI-Beta"] = Assistant
+	h["OpenAI-Beta"] = AssistantHeader
+
 	var tools []M
 
 	t := M{"type": "code_interpreter"}
@@ -55,11 +56,11 @@ func (c Client) CreateAssistant() *AssistantRes {
 		Payload: p,
 	}
 
-	resp, err := c.DispatchRequest(r, &AssistantRes{})
+	resp, err := c.DispatchRequest(r, &Assistant{})
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	return resp.(*AssistantRes)
+	return resp.(*Assistant)
 }

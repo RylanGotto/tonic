@@ -1,0 +1,14 @@
+{
+  "name": "fetch",
+  "description": "Get the content from a url",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "url": {
+        "type": "string",
+        "description": "If the user requests the content of a url or article this function will retrieve the html document"
+      }
+    },
+    "required": ["url"]
+  }
+}

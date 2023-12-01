@@ -4,19 +4,35 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 )
 
 type Client struct {
 	C *http.Client
 }
 
+type OpenAiCall interface {
+	ChatCompletion(um string) *ChatCompletion
+	CreateAssistant() *Assistant
+	CreateThread() *Thread
+	CreateMessage(thread_id string, content string) *Message
+	RetrieveMessage(thread_id string, message_id string) *Message
+	ListMessages(thread_id string) *MessageList
+	CreateRun(assistant_id string, thread_id string) *Runs
+	CreateThreadAndRun(assistant_id string, content string) *Runs
+	RetrieveRun(thread_id string, run_id string) *Runs
+	ListRuns(thread_id string) *Runs
+	CancelRun(thread_id string, run_id string) *Runs
+	SubmitToolOutput(thread_id string, run_id string, tool_outputs []interface{}) *Runs
+	RetrieveRunStep(thread_id string, run_id string, step_id string) *RunStep
+	ListRunSteps(thread_id string, run_id string) *ListRunStep
+}
+
 type OpenAI struct {
-	OpenAiCall interface {
-		ChatCompletion(um string) *ChatCompletionRes
-		CreateAssistant() *AssistantRes
-	}
+	OpenAiCall OpenAiCall
 }
 
 type Response struct {
@@ -45,7 +61,7 @@ func Error() error {
 	return &RequestError{Err: errors.New("error creating request")}
 }
 
-func InitClient() OpenAI {
+func New() OpenAI {
 	c := Client{C: &http.Client{}}
 	return OpenAI{
 		OpenAiCall: c,
@@ -53,6 +69,16 @@ func InitClient() OpenAI {
 }
 
 func createRequest(r Request) (*http.Request, error) {
+	if r.Type == "GET" {
+		req, err := http.NewRequest(r.Type, r.Url, nil)
+		for i, k := range r.Headers {
+			req.Header.Set(i, k.(string))
+		}
+		if err != nil {
+			log.Fatalln(err)
+		}
+		return req, nil
+	}
 	if r.Type == "POST" {
 
 		j, err := json.Marshal(r.Payload)
@@ -75,7 +101,7 @@ func createRequest(r Request) (*http.Request, error) {
 }
 
 func Headers() M {
-	return M{"Authorization": OpenAiToken, "Content-Type": ContentType}
+	return M{"Authorization": fmt.Sprintf("Bearer %s", os.Getenv("OPENAI_API_KEY")), "Content-Type": ContentType}
 }
 
 func (c Client) DispatchRequest(r Request, t interface{}) (interface{}, error) {
@@ -90,10 +116,6 @@ func (c Client) DispatchRequest(r Request, t interface{}) (interface{}, error) {
 
 	if err != nil {
 		return nil, err
-	}
-
-	if err != nil {
-		log.Fatalln(err)
 	}
 
 	derr := json.NewDecoder(resp.Body).Decode(t)

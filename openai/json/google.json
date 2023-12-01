@@ -1,0 +1,14 @@
+{
+  "name": "google",
+  "description": "Gets search results from google",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "query": {
+        "type": "string",
+        "description": "The user query to get infomation from google about"
+      }
+    },
+    "required": ["query"]
+  }
+}

@@ -5,6 +5,8 @@ import (
 	"log"
 	"omni/openai"
 	"os"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -14,6 +16,11 @@ func main() {
 	}
 	log.SetOutput(file)
 
+	err = godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
+
 	// db, err := dbase.InitDatabase()
 
 	// if err != nil {
@@ -22,10 +29,16 @@ func main() {
 
 	// server.Serv(db)
 
-	client := openai.InitClient()
+	client := openai.New()
+	// Thread := client.OpenAiCall.CreateThread()
 
-	r := client.OpenAiCall.CreateAssistant()
-	f := client.OpenAiCall.ChatCompletion("Hello, I am Rylan. How are you.")
-	fmt.Println(r)
-	fmt.Println(f)
+	// ai := openai.NewAssistant(client, Thread)
+	// r := ai.MessageAssistant("Can you please get the news for me?").(*openai.ListRunStep)
+	// fmt.Println(r)
+
+	// r := client.OpenAiCall.VisionCompletion("What is in this photo?")
+	// fmt.Println(r)
+
+	c := client.OpenAiCall.ChatCompletion("Hello")
+	fmt.Println(c)
 }
